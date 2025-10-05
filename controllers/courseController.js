@@ -17,8 +17,6 @@ export const createCourse = async (req, res) => {
       image,
       syllabus,
       features,
-      duration,
-      instructorName,
       status,
       level,
       tags,
@@ -31,14 +29,12 @@ export const createCourse = async (req, res) => {
       description,
       category,
       syllabus,
-      instructorName,
       status,
-      level,
-      duration
+      level
     });
 
     // Validate required fields
-    if (!title || !description || !category || !syllabus || !instructorName) {
+    if (!title || !description || !category || !syllabus) {
       console.log('Validation failed - missing required fields');
       return res.status(400).json({
         success: false,
@@ -71,30 +67,17 @@ export const createCourse = async (req, res) => {
     let parsedTags = [];
     let parsedRequirements = [];
     let parsedLearningOutcomes = [];
-    let parsedDuration = {};
 
     try {
       if (features) parsedFeatures = JSON.parse(features);
       if (tags) parsedTags = JSON.parse(tags);
       if (requirements) parsedRequirements = JSON.parse(requirements);
       if (learningOutcomes) parsedLearningOutcomes = JSON.parse(learningOutcomes);
-      if (duration) parsedDuration = JSON.parse(duration);
       console.log('JSON parsing completed successfully');
     } catch (parseError) {
       console.error('Error parsing JSON fields:', parseError);
     }
 
-    // Validate duration dates
-    if (parsedDuration && parsedDuration.startDate && parsedDuration.endDate) {
-      if (new Date(parsedDuration.startDate) >= new Date(parsedDuration.endDate)) {
-        console.log('Duration validation failed - end date must be after start date');
-        return res.status(400).json({
-          success: false,
-          message: 'End date must be after start date'
-        });
-      }
-      console.log('Duration validation passed');
-    }
 
     // Create new course
     const courseData = {
@@ -105,8 +88,6 @@ export const createCourse = async (req, res) => {
       image: imagePath,
       syllabus,
       features: parsedFeatures,
-      duration: parsedDuration,
-      instructorName,
       status: status || 'upcoming',
       level: level || 'beginner',
       tags: parsedTags,
@@ -187,13 +168,11 @@ export const getAllCourses = async (req, res) => {
     if (category) filter.category = category;
     if (status) filter.status = status;
     if (level) filter.level = level;
-    if (instructor) filter.instructorName = { $regex: instructor, $options: 'i' };
     
     if (search) {
       filter.$or = [
         { title: { $regex: search, $options: 'i' } },
-        { description: { $regex: search, $options: 'i' } },
-        { instructorName: { $regex: search, $options: 'i' } }
+        { description: { $regex: search, $options: 'i' } }
       ];
     }
 
@@ -209,7 +188,6 @@ export const getAllCourses = async (req, res) => {
       .sort(sort)
       .skip(skip)
       .limit(parseInt(limit))
-      .populate('instructorName', 'name email');
 
     // Get total count for pagination
     const total = await Course.countDocuments(filter);
@@ -271,8 +249,6 @@ export const updateCourse = async (req, res) => {
       image,
       syllabus,
       features,
-      duration,
-      instructorName,
       status,
       level,
       tags,
@@ -311,27 +287,16 @@ export const updateCourse = async (req, res) => {
     let parsedTags = existingCourse.tags;
     let parsedRequirements = existingCourse.requirements;
     let parsedLearningOutcomes = existingCourse.learningOutcomes;
-    let parsedDuration = existingCourse.duration;
 
     try {
       if (features) parsedFeatures = JSON.parse(features);
       if (tags) parsedTags = JSON.parse(tags);
       if (requirements) parsedRequirements = JSON.parse(requirements);
       if (learningOutcomes) parsedLearningOutcomes = JSON.parse(learningOutcomes);
-      if (duration) parsedDuration = JSON.parse(duration);
     } catch (parseError) {
       console.error('Error parsing JSON fields:', parseError);
     }
 
-    // Validate duration dates if provided
-    if (parsedDuration && parsedDuration.startDate && parsedDuration.endDate) {
-      if (new Date(parsedDuration.startDate) >= new Date(parsedDuration.endDate)) {
-        return res.status(400).json({
-          success: false,
-          message: 'End date must be after start date'
-        });
-      }
-    }
 
     // Update course
     const updatedCourse = await Course.findByIdAndUpdate(
@@ -344,8 +309,6 @@ export const updateCourse = async (req, res) => {
         image: imagePath,
         syllabus: syllabus || existingCourse.syllabus,
         features: parsedFeatures,
-        duration: parsedDuration,
-        instructorName: instructorName || existingCourse.instructorName,
         status: status || existingCourse.status,
         level: level || existingCourse.level,
         tags: parsedTags,
@@ -432,43 +395,6 @@ export const getCoursesByCategory = async (req, res) => {
   }
 };
 
-// Get courses by instructor
-export const getCoursesByInstructor = async (req, res) => {
-  try {
-    const { instructorName } = req.params;
-    const { page = 1, limit = 10 } = req.query;
-
-    const skip = (page - 1) * limit;
-
-    const courses = await Course.find({ 
-      instructorName: { $regex: instructorName, $options: 'i' } 
-    })
-      .sort({ createdAt: -1 })
-      .skip(skip)
-      .limit(parseInt(limit));
-
-    const total = await Course.countDocuments({ 
-      instructorName: { $regex: instructorName, $options: 'i' } 
-    });
-
-    res.status(200).json({
-      success: true,
-      count: courses.length,
-      total,
-      currentPage: parseInt(page),
-      totalPages: Math.ceil(total / limit),
-      data: courses
-    });
-
-  } catch (error) {
-    console.error('Error fetching courses by instructor:', error);
-    res.status(500).json({
-      success: false,
-      message: 'Error fetching courses by instructor',
-      error: error.message
-    });
-  }
-};
 
 // Search courses
 export const searchCourses = async (req, res) => {
@@ -488,7 +414,6 @@ export const searchCourses = async (req, res) => {
       $or: [
         { title: { $regex: q, $options: 'i' } },
         { description: { $regex: q, $options: 'i' } },
-        { instructorName: { $regex: q, $options: 'i' } },
         { category: { $regex: q, $options: 'i' } },
         { tags: { $in: [new RegExp(q, 'i')] } }
       ]
@@ -501,7 +426,6 @@ export const searchCourses = async (req, res) => {
       $or: [
         { title: { $regex: q, $options: 'i' } },
         { description: { $regex: q, $options: 'i' } },
-        { instructorName: { $regex: q, $options: 'i' } },
         { category: { $regex: q, $options: 'i' } },
         { tags: { $in: [new RegExp(q, 'i')] } }
       ]

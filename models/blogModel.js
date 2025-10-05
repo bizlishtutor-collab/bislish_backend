@@ -29,7 +29,7 @@ const blogSchema = new mongoose.Schema({
   category: {
     type: String,
     required: [true, 'Blog category is required'],
-    enum: ['IELTS preparation', 'Spoken English', 'English for competitive exams', 'GRE Vocabulary']
+    enum: ['IELTS preparation', 'Spoken English', 'English for competitive exams', 'GRE Vocabulary', 'Education']
   },
   tags: [{
     type: String,
@@ -67,17 +67,6 @@ const blogSchema = new mongoose.Schema({
     type: Number,
     default: 0
   },
-  // Likes functionality
-  likes: [{
-    userEmail: {
-      type: String,
-      required: true
-    },
-    likedAt: {
-      type: Date,
-      default: Date.now
-    }
-  }],
   // SEO and social
   featured: {
     type: Boolean,

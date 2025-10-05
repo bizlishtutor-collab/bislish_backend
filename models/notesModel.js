@@ -20,7 +20,7 @@ const notesSchema = new mongoose.Schema({
     type: String, 
     required: true, 
     trim: true,
-    enum: ['IELTS preparation', 'Spoken English', 'English for competitive exams', 'GRE Vocabulary']
+    enum: ['IELTS preparation', 'Spoken English', 'English for competitive exams', 'GRE Vocabulary', 'Education']
   },
   difficulty: { 
     type: String, 

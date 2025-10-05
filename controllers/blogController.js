@@ -159,60 +159,6 @@ export const getBlogBySlug = async (req, res) => {
   }
 };
 
-// Toggle like on blog
-export const toggleBlogLike = async (req, res) => {
-  try {
-    const { blogId } = req.params;
-    const { userEmail } = req.body;
-
-    if (!userEmail) {
-      return res.status(400).json({
-        success: false,
-        message: 'User email is required'
-      });
-    }
-
-    const blog = await Blog.findById(blogId);
-    if (!blog) {
-      return res.status(404).json({
-        success: false,
-        message: 'Blog not found'
-      });
-    }
-
-    // Check if user already liked the blog
-    const existingLike = blog.likes.find(like => like.userEmail === userEmail);
-
-    if (existingLike) {
-      // Remove like
-      blog.likes = blog.likes.filter(like => like.userEmail !== userEmail);
-    } else {
-      // Add like
-      blog.likes.push({
-        userEmail,
-        likedAt: new Date()
-      });
-    }
-
-    await blog.save();
-
-    res.json({
-      success: true,
-      message: existingLike ? 'Like removed' : 'Blog liked',
-      data: {
-        liked: !existingLike,
-        likeCount: blog.likes.length
-      }
-    });
-  } catch (error) {
-    console.error('Toggle blog like error:', error);
-    res.status(500).json({
-      success: false,
-      message: 'Error toggling like',
-      error: error.message
-    });
-  }
-};
 
 // Create new blog
 export const createBlog = async (req, res) => {

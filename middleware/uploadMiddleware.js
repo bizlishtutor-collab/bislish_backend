@@ -4,7 +4,7 @@ import fs from 'fs';
 
 // Define allowed extensions for images and documents
 const allowedImageTypes = /jpeg|jpg|png|gif/;
-const allowedVideoTypes = /mp4|mov|avi|mkv/;
+const allowedVideoTypes = /.*/; // Allow any video format
 const allowedDocTypes = /pdf|doc|docx/;
 const allowedNotesTypes = /pdf|doc|docx|txt|ppt|pptx|xls|xlsx/;
 

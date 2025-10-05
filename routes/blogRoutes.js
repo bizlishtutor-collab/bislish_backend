@@ -8,8 +8,7 @@ import {
   updateBlog,
   deleteBlog,
   getBlogStats,
-  uploadBlogImage,
-  toggleBlogLike
+  uploadBlogImage
 } from '../controllers/blogController.js';
 import { requireSignIn } from '../Middlewares/authMiddlewares.js';
 import { uploadCourseFiles, handleUploadError } from '../middleware/uploadMiddleware.js';
@@ -19,7 +18,6 @@ const router = express.Router();
 // Public routes
 router.get('/published', getPublishedBlogs);
 router.get('/slug/:slug', getBlogBySlug);
-router.post('/:blogId/like', toggleBlogLike);
 
 // Protected routes (admin only)
 router.use(requireSignIn);

@@ -6,7 +6,6 @@ import {
   updateCourse,
   deleteCourse,
   getCoursesByCategory,
-  getCoursesByInstructor,
   searchCourses,
   getCourseStats
 } from '../controllers/courseController.js';
@@ -19,7 +18,6 @@ const router = express.Router();
 router.get('/getall', getAllCourses);
 router.get('/get/:id', getCourseById);
 router.get('/category/:category', getCoursesByCategory);
-router.get('/instructor/:instructorName', getCoursesByInstructor);
 router.get('/search', searchCourses);
 router.get('/stats', getCourseStats);
 

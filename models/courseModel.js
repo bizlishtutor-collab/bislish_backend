@@ -43,22 +43,6 @@ const courseSchema = new mongoose.Schema({
       message: 'Features cannot exceed 10 items'
     }
   },
-  duration: {
-    startDate: {
-      type: Date,
-      required: [true, 'Start date is required']
-    },
-    endDate: {
-      type: Date,
-      required: [true, 'End date is required']
-    }
-  },
-  instructorName: {
-    type: String,
-    required: [true, 'Instructor name is required'],
-    trim: true,
-    maxlength: [50, 'Instructor name cannot exceed 50 characters']
-  },
   price: {
     type: Number,
     default: 0,
@@ -102,17 +86,7 @@ const courseSchema = new mongoose.Schema({
 
 // Index for better query performance
 courseSchema.index({ category: 1, status: 1 });
-courseSchema.index({ instructorName: 1 });
-courseSchema.index({ 'duration.startDate': 1 });
 
-// Virtual for duration in days
-courseSchema.virtual('durationInDays').get(function() {
-  if (this.duration.startDate && this.duration.endDate) {
-    const diffTime = Math.abs(this.duration.endDate - this.duration.startDate);
-    return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-  }
-  return 0;
-});
 
 // Virtual for available spots
 courseSchema.virtual('availableSpots').get(function() {
@@ -129,14 +103,5 @@ courseSchema.virtual('enrollmentPercentage').get(function() {
 courseSchema.set('toJSON', { virtuals: true });
 courseSchema.set('toObject', { virtuals: true });
 
-// Pre-save middleware to validate dates
-courseSchema.pre('save', function(next) {
-  if (this.duration.startDate && this.duration.endDate) {
-    if (this.duration.startDate >= this.duration.endDate) {
-      return next(new Error('End date must be after start date'));
-    }
-  }
-  next();
-});
 
 export default mongoose.model('Course', courseSchema);
