@@ -34,15 +34,24 @@ const app = express();
 
 // CORS configuration
 app.use(cors({
-  origin: ['http://localhost:8080', 'http://localhost:8081', 'http://localhost:3000', 'http://127.0.0.1:8080', 'http://127.0.0.1:8081', 'http://127.0.0.1:3000'],
+  origin: [
+    'http://localhost:8080', 
+    'http://localhost:8081', 
+    'http://localhost:3000', 
+    'http://127.0.0.1:8080', 
+    'http://127.0.0.1:8081', 
+    'http://127.0.0.1:3000',
+    'https://bizlish.online',
+    'https://www.bizlish.online'
+  ],
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With']
 }));
 
 // Middleware
-app.use(express.json()); // Parse incoming JSON requests
-app.use(express.urlencoded({ extended: true })); // Parse URL-encoded bodies
+app.use(express.json({ limit: '50mb' })); // Parse incoming JSON requests
+app.use(express.urlencoded({ extended: true, limit: '50mb' })); // Parse URL-encoded bodies
 
 // Add request logging middleware
 app.use((req, res, next) => {
