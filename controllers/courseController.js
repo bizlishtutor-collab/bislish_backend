@@ -33,16 +33,7 @@ export const createCourse = async (req, res) => {
       level
     });
 
-    // Validate required fields
-    if (!title || !description || !category || !syllabus) {
-      console.log('Validation failed - missing required fields');
-      return res.status(400).json({
-        success: false,
-        message: 'All required fields must be provided'
-      });
-    }
-
-    console.log('Validation passed - all required fields present');
+    console.log('Creating course with provided data');
 
     // Handle file uploads
     let videoPath = '';
